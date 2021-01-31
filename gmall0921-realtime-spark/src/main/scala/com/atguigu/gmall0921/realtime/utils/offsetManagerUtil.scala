@@ -48,7 +48,7 @@ object offsetManagerUtil {
       val offset: Long = offsetRange.untilOffset //偏移量结束点
       offsetMapForRedis.put(partition.toString, offset.toString)
     }
-    println("写入偏移量结束点："+offsetMapForRedis)
+    println("写入偏移量结束点：" + offsetMapForRedis)
     jedis.hmset(offsetKey, offsetMapForRedis)
     jedis.close()
 

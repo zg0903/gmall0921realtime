@@ -8,7 +8,7 @@ import io.searchbox.client.config.HttpClientConfig
 import io.searchbox.core.{Bulk, BulkResult, Index, Search, SearchResult}
 import org.elasticsearch.index.query.MatchQueryBuilder
 import org.elasticsearch.search.builder.SearchSourceBuilder
-import org.elasticsearch.search.highlight.HighlightBuilder
+//import org.elasticsearch.search.highlight.HighlightBuilder
 import org.elasticsearch.search.sort.SortOrder
 
 
