@@ -89,6 +89,7 @@ object BaseDBCanalApp {
                 import collection.JavaConverters._
                 for (data <- dataArr.asScala) {
                   val dataJsonObj: JSONObject = data.asInstanceOf[JSONObject]
+                  println(dataJsonObj)
                   MyKafkaSink.send(topic, dataJsonObj.toJSONString)
                 }
               }
