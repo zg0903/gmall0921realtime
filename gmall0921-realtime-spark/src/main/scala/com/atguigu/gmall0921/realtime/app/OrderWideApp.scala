@@ -118,9 +118,10 @@ object OrderWideApp {
         val orderInfoRDD: RDD[OrderInfo] = rdd.map { orderInfo =>
           val provinceMap: mutable.Map[String, JSONObject] = provinceBC.value
           val provinceObj: JSONObject = provinceMap.getOrElse(HbaseUtil.getDimRowkey(orderInfo.province_id.toString), null)
-
+          println("namename")
           orderInfo.province_name = provinceObj.getString("name")
           orderInfo.province_area_code = provinceObj.getString("area_code")
+          println("area_code")
           orderInfo.province_iso_code = provinceObj.getString("iso_code")
           orderInfo.province_3166_2_code = provinceObj.getString("iso_3166_2")
 
@@ -183,9 +184,10 @@ object OrderWideApp {
     }
 
 
-    orderInfoWithDimDstream.print(1000)
+    //    orderInfoWithDimDstream.print(1000)
     //        orderDetailDstream.print(1000)
 
+    orderWideDStream.print(1000)
     ssc.start()
     ssc.awaitTermination()
 

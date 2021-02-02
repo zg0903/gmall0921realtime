@@ -12,17 +12,28 @@ import com.alibaba.fastjson.{JSONObject, JSONPObject}
  * @date 2021-01-30-16:41
  */
 object MysqlUtil {
-  def queryList(sql: String) = {
+
+  def main(args: Array[String]): Unit = {
+    val objects: util.List[JSONObject] = queryList("select * from base_province")
+    val objects1: util.List[JSONObject] = queryList("select * from user_info")
+    //    println(objects)
+    println(objects)
+  }
+
+
+  def queryList(sql: String): java.util.List[JSONObject] = {
     Class.forName("com.mysql.jdbc.Driver")
-    val resultList: java.util.List[JSONObject] = new util.ArrayList[JSONObject]()
-    val conn: Connection = DriverManager.getConnection("jdbc:mysql://hadoop102:3306/gmall0921?characterEncoding=utf-8&useSSL=false", "root", "mima0903!")
+    val resultList: java.util.List[JSONObject] = new java.util.ArrayList[JSONObject]()
+    val conn: Connection = DriverManager
+      .getConnection("jdbc:mysql://hadoop102:3306/gmall0921?characterEncoding=utf-8&useSSL=false", "root", "mima0903!")
     val stat: Statement = conn.createStatement
+    println(sql)
     val rs: ResultSet = stat.executeQuery(sql)
     val md: ResultSetMetaData = rs.getMetaData
     while (rs.next) {
       val rowData = new JSONObject();
       for (i <- 1 to md.getColumnCount) {
-        rowData.put(md.getCatalogName(i), rs.getObject(i))
+        rowData.put(md.getColumnName(i), rs.getObject(i))
       }
       resultList.add(rowData)
     }
@@ -32,5 +43,5 @@ object MysqlUtil {
     resultList
   }
 
-
 }
+

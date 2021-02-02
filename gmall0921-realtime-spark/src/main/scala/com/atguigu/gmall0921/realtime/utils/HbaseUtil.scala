@@ -91,8 +91,9 @@ object HbaseUtil {
       val value: AnyRef = colValue._2
       if (value != null && value.toString.length > 0) {
 
-        puts.add(new Put(Bytes.toBytes(rowKey)).addColumn(Bytes.toBytes(DEFAULT_FAMILY), Bytes.toBytes(col
-        ), Bytes.toBytes(value.toString)))
+        val put = new Put(Bytes.toBytes(rowKey)).addColumn(Bytes.toBytes(DEFAULT_FAMILY), Bytes.toBytes(col), Bytes.toBytes(value.toString))
+        puts.add(put)
+
       }
     }
     table.put(puts)
