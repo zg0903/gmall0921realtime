@@ -1,12 +1,13 @@
 package com.atguigu.gmall0921.realtime.app
 
+import java.text.SimpleDateFormat
 import java.util
 import java.util.Date
 
 import com.alibaba.fastjson.serializer.SerializeConfig
 import com.alibaba.fastjson.{JSON, JSONObject}
 import com.atguigu.gmall0921.realtime.bean.{OrderDetail, OrderInfo, OrderWide}
-import com.atguigu.gmall0921.realtime.utils.{HbaseUtil, MykafkaUtil, RedisUtil, offsetManagerUtil}
+import com.atguigu.gmall0921.realtime.utils.{HbaseUtil, MyEsUtil, MykafkaUtil, RedisUtil, offsetManagerUtil}
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.common.TopicPartition
 import org.apache.spark.SparkConf
@@ -118,10 +119,10 @@ object OrderWideApp {
         val orderInfoRDD: RDD[OrderInfo] = rdd.map { orderInfo =>
           val provinceMap: mutable.Map[String, JSONObject] = provinceBC.value
           val provinceObj: JSONObject = provinceMap.getOrElse(HbaseUtil.getDimRowkey(orderInfo.province_id.toString), null)
-          println("namename")
+//          println("namename")
           orderInfo.province_name = provinceObj.getString("name")
           orderInfo.province_area_code = provinceObj.getString("area_code")
-          println("area_code")
+//          println("area_code")
           orderInfo.province_iso_code = provinceObj.getString("iso_code")
           orderInfo.province_3166_2_code = provinceObj.getString("iso_3166_2")
 
@@ -181,6 +182,22 @@ object OrderWideApp {
 
       jedis.close()
       orderWideList
+    }
+
+
+    orderWideDStream.foreachRDD {
+      rdd =>
+        rdd.foreachPartition {
+          orderWideItr => {
+            val dateFormat = new SimpleDateFormat("yyyy-MM-dd")
+            val dateStr: String = dateFormat.format(new Date)
+            val indexName = "gmall0921_order_wide_" + dateStr
+            val dataList: List[(String, OrderWide)] = orderWideItr.toList.map(orderWide => (orderWide.detail_id.toString, orderWide))
+            MyEsUtil.saveBulk(indexName, dataList)
+          }
+            offsetManagerUtil.svaOffset(orderInfoTopic, groupid, orderInfoOffsetRanges)
+            offsetManagerUtil.svaOffset(orderDetailTopic, groupid, orderDetailOffsetRanges)
+        }
     }
 
 
